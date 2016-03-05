@@ -195,6 +195,11 @@ int kchname(char name[32])
 	strcpy(running->name, str);
 }
 
+int kmode()
+{
+	printf("kmode not implemented\n");
+}
+
 
 int kexec(char *y) // y points at filenmae in Umode space
 {

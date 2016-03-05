@@ -32,6 +32,14 @@
 #define SLEEP    4
 #define ZOMBIE   5
 
+/**********For Pipes***********/
+#define READ_PIPE  4
+#define WRITE_PIPE 5
+#define NOFT      20
+#define NFD       10
+#define PSIZE 10
+#define NPIPE 10
+
 extern int color;
 extern int MTXSEG  = 0x1000;
 
@@ -162,6 +170,20 @@ INODE *ip;
 DIR   *dir;
 char  *cp;
 
+//pipe structs
+typedef struct Oft{
+  int   mode;
+  int   refCount;
+  struct pipe *pipe_ptr;
+} OFT;
+
+typedef struct pipe{
+  char  buf[PSIZE];
+  int   head, tail, data, room;
+  int   nreader, nwriter;
+  int   busy;
+}PIPE;
+
 typedef struct proc{
     struct proc *next;
     int    *ksp;               // at offset 2
@@ -178,9 +200,10 @@ typedef struct proc{
     int    exitCode;
     char   name[32];           // name string of PROC
 
+    OFT    *fd[NFD];
+
     int    kstack[SSIZE];      // per proc stack area
 }PROC;
-
 
 /******Conner's Additions Below***********/
 // additions from io.h from lab 2
@@ -251,12 +274,11 @@ PROC *kfork(char *filename);
 int kgetpid();
 int kprintstatus();
 int kchname(char name[32]);
+int kmode();
 int get_block(u16 blk, char *buf);
 
 //inode.c
 int getInodeFromFile(char *filename);
-
-//char **chopFirstStringElement(char *array[MAX]);
 int chopFirstStringElement(char path[10][32]);
 int findInode(char path[10][32]);
 u16 search(char name[32]);
@@ -266,12 +288,19 @@ int parseInput(char *input, char **parsedinput, char *delimiter);
 //ForkExec.c
 //int clear_bss(u16 segment, u16 tsize, u16 dsize, u16 bsize);
 //int move(segment, tsize, dsize) u16 segment, tsize, dsize;
-
 int fork();
 int exec();
-
 int ufork();
 int uexec();
+
+//pipe.c
+show_pipe(PIPE *p);
+int pfd();
+int read_pipe(int fd, char *buf, int n);
+int write_pipe(int fd, char *buf, int n);
+int kpipe(int pd[2]);
+int close_pipe(int fd);
+
 
 //io.c
 int rpu(u32 x);

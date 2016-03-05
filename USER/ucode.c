@@ -39,8 +39,8 @@ int ps()
 int chname()
 {
     char s[64];
-    printf("\ninput new name : ");
-    gets(s);
+    //printf("\ninput new name : ");
+    //gets(s);
     syscall(2, s, 0);
 }
 

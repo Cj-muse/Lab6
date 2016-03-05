@@ -7,8 +7,8 @@ int getInodeFromFile(char *filename)
   int i = 0, ino = 0;
   u16 blk;
 
-  printf("GetInodeNumberFromFile() \n");
-  printf("filename = %s\n", filename);
+  //printf("GetInodeNumberFromFile() \n");
+  //printf("filename = %s\n", filename);
 
   //parse filename into a char *path[MAX]
   numberOfFiles = parseInput(filename, path, "/");
@@ -16,10 +16,10 @@ int getInodeFromFile(char *filename)
   getblk(2, buffer); // get the group descriptor
   gp = (GD *)buffer;
   InodeBeginBlk = (u16)gp->bg_inode_table; //get the inode begin block
-  printf("InodeBeginBlk=%d\n", InodeBeginBlk);
+  //printf("InodeBeginBlk=%d\n", InodeBeginBlk);
   getblk(InodeBeginBlk, buffer);  /* read first inode block */
   ip = (INODE *)buffer +1; // now you have the root INODE
-  printf("ip->i_mode=%x\n", ip->i_mode);
+  //printf("ip->i_mode=%x\n", ip->i_mode);
 
   //search for file using the path.
   ino = findInode(path);
@@ -32,7 +32,7 @@ int findInode(char path[10][32])
 
     while (strcmp(path[i], "") != 0)
     {
-      printf("path[%d] = %s\n", i, path[i]);
+      //printf("path[%d] = %s\n", i, path[i]);
       ino = search(path[i]);
       if (ino ==-1)
       {
@@ -42,7 +42,7 @@ int findInode(char path[10][32])
       ip = getINODE(ino);
       i++;
     }
-    printf("ino = %d\n", ino);
+    //printf("ino = %d\n", ino);
     return ino;
 }
 
@@ -77,8 +77,8 @@ INODE *getINODE(int ino)
 	u16 blocknumber;
 	INODE * inode;
 
-	printf("In getINODE ino = %d\n", ino);
-	printf("InoBeginBlk = %d\n", InodeBeginBlk);
+	//printf("In getINODE ino = %d\n", ino);
+	//printf("InoBeginBlk = %d\n", InodeBeginBlk);
 
 	inoblock = (ino-1)/8;
 	offset = (ino-1)%8;
@@ -91,7 +91,7 @@ INODE *getINODE(int ino)
 	// block is now in buffer
 	// access specific inode with offset
 	inode = (INODE *)buffer3 + offset;
-	printf("returning an inode %d ", ino);
+	//printf("returning an inode %d ", ino);
 	//printf("at address %x from buffer %x\n",inode,buffer);
 	return inode;
 }

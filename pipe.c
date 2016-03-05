@@ -50,7 +50,8 @@ int close_pipe(int fd)
              return;
         }
       }
-      wakeup(&pp->room);               // wakeup any WRITER on pipe
+      //was wakeup() not sure if necessary
+      kwakeup(&pp->room);               // wakeup any WRITER on pipe
       return;
   }
 
