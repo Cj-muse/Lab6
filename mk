@@ -20,7 +20,7 @@ sudo cp mtx /mnt/boot
 sudo umount /mnt
 rm *.o mtx
 
-(cd USER; ./mku u1 u2)
+(cd USER; ./mku u1)
 echo done
 
 qemu-system-x86_64 -fda mtximage -no-fd-bootchk
