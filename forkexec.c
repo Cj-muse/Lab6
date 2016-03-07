@@ -1,4 +1,5 @@
 #include "header.h"
+
 int copyImage(u16 child_segment)
 {
   u16 i;

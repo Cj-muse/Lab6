@@ -36,9 +36,9 @@
 #define READ_PIPE  4
 #define WRITE_PIPE 5
 #define NOFT      20
-#define NFD       10
-#define PSIZE 10
-#define NPIPE 10
+#define NFD       20
+#define PSIZE     10
+#define NPIPE     10
 
 extern int color;
 extern int MTXSEG  = 0x1000;
@@ -171,18 +171,18 @@ DIR   *dir;
 char  *cp;
 
 //pipe structs
-typedef struct Oft{
-  int   mode;
-  int   refCount;
-  struct pipe *pipe_ptr;
-} OFT;
-
 typedef struct pipe{
   char  buf[PSIZE];
   int   head, tail, data, room;
   int   nreader, nwriter;
   int   busy;
 }PIPE;
+
+typedef struct Oft{
+  int   mode;
+  int   refCount;
+  struct pipe *pipe_ptr;
+} OFT;
 
 typedef struct proc{
     struct proc *next;
@@ -233,7 +233,6 @@ struct dap{                // DAP for extended INT 13-42
 };
 
 struct dap dap, *dp;       // global dap struct
-
 
 
 /****** type.h additions *********/
@@ -300,7 +299,8 @@ int read_pipe(int fd, char *buf, int n);
 int write_pipe(int fd, char *buf, int n);
 int kpipe(int pd[2]);
 int close_pipe(int fd);
-
+int initPipe(PIPE *p);
+int initOFT(OFT *t, int mode, PIPE *p);
 
 //io.c
 int rpu(u32 x);
