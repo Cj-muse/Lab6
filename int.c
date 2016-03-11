@@ -29,7 +29,7 @@ int kcinth()
 
  printf("interupthandler a = %d\n", a);
    switch(a){
-       case 0 : r = kgetpid();     break;
+       case 0 : r = running->pid;     break;
        case 1 : r = do_ps();          break;
        case 2 : r = kchname(b);        break;
        case 3 : r = kmode();          break;

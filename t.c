@@ -78,7 +78,7 @@ main()
 {
     printf("MTX starts in main()\n\r");
     init();      // initialize and create P0 as running
-    set_vector(80, (int)int80h);
+    set_vector(80, int80h);
 
     kfork("/bin/u1");     // P0 kfork() P1
 

@@ -1,7 +1,7 @@
 #ifndef HEADER_H
 #define HEADER_H
 
-#include <math.h>
+//#include <math.h>
 
 #define NPROC    9
 #define SSIZE 1024
@@ -39,7 +39,7 @@
 #define NPIPE     10
 
 extern int color;
-extern int MTXSEG  = 0x1000;
+//extern int MTXSEG  = 0x1000;
 
 typedef unsigned char  u8;
 typedef unsigned int  u16;
@@ -248,6 +248,7 @@ char *pname[]={"Sun", "Mercury", "Venus", "Earth",  "Mars", "Jupiter",
 int goUmode();
 
 // t.c
+int body();
 int init();
 int scheduler();
 PROC *kfork();
