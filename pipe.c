@@ -48,13 +48,14 @@ int kpipe(int pd[2])
   PIPE *p;
   OFT *readFT, *writeFT;
 
+  printf("creating pipe\n");
   // create a pipe; fill pd[0] pd[1] (in USER mode!!!) with descriptors
   initPipe(p);
   initOFT(readFT, READ_PIPE, p);
   initOFT(writeFT, WRITE_PIPE, p);
 
   show_pipe(p);
-  getc();
+
   //  Allocate 2 free entries in the PROC.fd[] array,
   for (i=0; i < NFD-1; i++)
   {
@@ -62,6 +63,8 @@ int kpipe(int pd[2])
       {
           running->fd[i]   = readFT;
           running->fd[i+1] = writeFT;
+          //put_word(i, running->uss, pd++);
+          //put_word(i+1, running->uss, pd);
           break;
       }
   }
@@ -69,6 +72,9 @@ int kpipe(int pd[2])
   // set indicies of running procs fd's to pd[]
   pd[0] = i;
   pd[1] = i+1;
+  //printf("p[0]: %d p[1]: %d i = %d\n", pd[0],pd[1],i);
+  //printf("running->fd[i]->mode: %d\n", running->fd[i]->mode);
+  //printf("running->fd[i+1]->mode: %d\n", running->fd[i+1]->mode);
 
   printf("returning from kpipe\n");
 

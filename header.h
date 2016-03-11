@@ -5,8 +5,6 @@
 
 #define NPROC    9
 #define SSIZE 1024
-#define AX 8
-#define PA 13
 #define BLOCK_SIZE        1024
 #define BLKSIZE           1024
 
