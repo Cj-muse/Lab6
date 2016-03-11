@@ -111,8 +111,10 @@ int pipe()
 {
    printf("pipe syscall\n");
    syscall(30, pd, 0);
+   getc();
    printf("proc %d created a pipe with fd = %d %d\n",
-           getpid(), pd[0], pd[1]);
+   getpid(), pd[0], pd[1]);
+   getc();
 }
 
 int pfd()
