@@ -6,6 +6,14 @@
 #define PD 16
 #define AX  8
 
+/*************************************************************************
+  usp  1   2   3   4   5   6   7   8   9  10   11   12    13  14  15  16
+----------------------------------------------------------------------------
+ |uds|ues|udi|usi|ubp|udx|ucx|ubx|uax|upc|ucs|uflag|retPC| a | b | c | d |
+----------------------------------------------------------------------------
+***************************************************************************/
+
+
 int kcinth()
 {
    u16    segment, offset;
@@ -19,8 +27,9 @@ int kcinth()
    c = get_word(segment, offset + 2*PC);
    d = get_word(segment, offset + 2*PD);
 
+ printf("interupthandler a = %d\n", a);
    switch(a){
-       case 0 : r = running->pid;     break;
+       case 0 : r = kgetpid();     break;
        case 1 : r = do_ps();          break;
        case 2 : r = kchname(b);        break;
        case 3 : r = kmode();          break;
@@ -44,5 +53,7 @@ int kcinth()
        case 99: do_exit(b);           break;
        default: printf("invalid syscall # : %d\n", a);
    }
+   printf("interupthandler r = %d\n", r);
+   //getc();
    put_word(r, segment, offset + 2*AX);
 }

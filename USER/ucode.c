@@ -90,7 +90,7 @@ int fork()
   int child;
   child = syscall(7,0,0,0);
   if (child)
-    printf("parent % return form fork, child=%d\n", getpid(), child);
+    printf("parent %d return form fork, child=%d\n", getpid(), child);
   else
     printf("child %d return from fork, child=%d\n", getpid(), child);
 }
@@ -110,8 +110,7 @@ int pd[2];
 int pipe()
 {
    printf("pipe syscall\n");
-   syscall(30, pd, 0);
-   getc();
+   syscall(30, pd, 0, 0);
    printf("proc %d created a pipe with fd = %d %d\n",
    getpid(), pd[0], pd[1]);
    getc();
