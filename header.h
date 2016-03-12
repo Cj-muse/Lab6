@@ -176,11 +176,16 @@ typedef struct pipe{
   int   busy;
 }PIPE;
 
+PIPE pipe[NPIPE];
+
+
 typedef struct Oft{
   int   mode;
   int   refCount;
   struct pipe *pipe_ptr;
 } OFT;
+
+OFT  oft[NOFT];
 
 typedef struct proc{
     struct proc *next;

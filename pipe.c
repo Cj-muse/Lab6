@@ -3,7 +3,7 @@ show_pipe(PIPE *p)
 {
    int i, j;
    // print pipe information
-   printf("------------ PIPE CONTENETS ------------\n");
+   printf("------------ PIPE CONTENTS ------------\n");
    printf("head: %d\n", p->head);
    printf("tail: %d\n", p->tail);
    printf("data: %d\n", p->data);
@@ -24,9 +24,12 @@ int pfd()
   // print running process' opened file descriptors
   printf("--------Proc %dOpen File Decsriptors---------\n", running->pid);
   for(i=0; running->fd[i]; i++)
-  {    printf("fd[%d]: %d \n", i, running->fd[i]);  }
-
-  if (0 == i)  { printf("NONE\n");}
+  {
+    printf("fd[%d]: %d \n", i, running->fd[i]);
+    printf("fd->mode: %d\n", running->fd[i]->mode);
+    //printf("fd->pipe->busy: %d\n", running->fd[i]->(struct *pipe_ptr));
+  }
+  if (0 == i) {printf("NONE\n");}
   printf("---------------------------------------------\n");
 }
 //============================================================
@@ -49,6 +52,14 @@ int kpipe(int pd[2])
   OFT *readFT, *writeFT;
 
   printf("creating pipe\n");
+  for (i=0; i<NPIPE; i++)
+  {
+    if (pipe[i].busy == 0)
+    break;
+  }
+  pipe[i].busy = 1;
+  p = &pipe[i];
+
   // create a pipe; fill pd[0] pd[1] (in USER mode!!!) with descriptors
   initPipe(p);
   initOFT(readFT, READ_PIPE, p);
@@ -72,9 +83,12 @@ int kpipe(int pd[2])
   // set indicies of running procs fd's to pd[]
   pd[0] = i;
   pd[1] = i+1;
-  //printf("p[0]: %d p[1]: %d i = %d\n", pd[0],pd[1],i);
-  //printf("running->fd[i]->mode: %d\n", running->fd[i]->mode);
-  //printf("running->fd[i+1]->mode: %d\n", running->fd[i+1]->mode);
+
+  /* fill user pipe[] array with i, i+1 */
+  put_word(i, running->uss, pd); put_word(i+1, running->uss, pd+1);
+  //put_word(i, running->uss, pd++); put_word(i+1, running->uss, pd);
+  printf("do_pipe : file descriptors = [%d %d]\n", i, i+1);
+  printf("do_pipe : file descriptors = [%d %d]\n", pd[0], pd[1]);
 
   printf("returning from kpipe\n");
 
@@ -114,12 +128,16 @@ int initPipe(PIPE *p)
   p->head = p->tail = p->data = 0;
   p->nwriter = p->nreader = 1;
   p->room = PSIZE;
-  p->busy = 0;
   return 1;
 }
 
 int initOFT(OFT *t, int mode, PIPE *p)
 {
+  int i = 0;
+  for (i=0; i<NOFT; i++){
+      if (oft[i].refCount == 0) break;
+  }
+  t = &oft[i];
   t->mode = mode;
   t->refCount = 1;
   t->pipe_ptr = p;

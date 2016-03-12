@@ -46,6 +46,12 @@ int init()
     proc[NPROC-1].next = 0;
     readyQueue = sleepList = 0;
 
+    for (i=0; i<NOFT; i++)
+        oft[i].refCount = 0;
+    for (i=0; i<NPIPE; i++)
+        pipe[i].busy = 0;
+
+
     /**** create P0 as running ******/
     p = get_proc(&freeList, FREE);
     p->status = RUNNING;
