@@ -109,11 +109,36 @@ int pd[2];
 
 int pipe()
 {
+  int child;
    printf("pipe syscall\n");
    syscall(30, pd, 0, 0);
    printf("proc %d created a pipe with fd = %d %d\n",
    getpid(), pd[0], pd[1]);
+
+   //fork child to share pipe
+   printf("now attempting to fork child to share pipe\n");
    getc();
+   child = syscall(7,0,0,0);
+
+   //syscall(34,0,0,0); //pfd
+   if (child)
+   {
+     printf("parent %d return form fork, child=%d\n", getpid(), child);
+     // parent writes to pipe close read oft pd[0]
+     close_pipe();
+     //now parent can write to pipe
+     //printf("%s\n", );
+     write_pipe();
+   }
+   else
+   {
+     printf("child %d return from fork, child=%d\n", getpid(), child);
+     // child reads from pipe close write pd[1]
+     close_pipe();
+     //now child can read from pipe
+     read_pipe();
+   }
+   //syscall(34,0,0,0); //pfd
 }
 
 int pfd()
@@ -127,7 +152,7 @@ int read_pipe()
   int fd, n, nbytes;
   pfd();
 
-  printf("read : enter fd nbytes : ");
+  printf("read : enter fd nbyt	es : ");
   gets(fds);
   sscanf(fds, "%d %d",&fd, &nbytes);
   printf("fd=%d  nbytes=%d\n", fd, nbytes);

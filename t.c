@@ -31,7 +31,7 @@ int body(void)
 
 int init()
 {
-    PROC *p; int i;
+    PROC *p; int i, j;
     color = 0x0C;
     printf("init ....");
     for (i=0; i<NPROC; i++){   // initialize all procs
@@ -41,7 +41,11 @@ int init()
         p->priority = 0;
         strcpy(proc[i].name, pname[i]);
         p->next = &proc[i+1];
+
+        for (j=0; j<NFD; j++)
+          p->fd[j] = 0;
     }
+
     freeList = &proc[0];      // all procs are in freeList
     proc[NPROC-1].next = 0;
     readyQueue = sleepList = 0;
@@ -50,7 +54,6 @@ int init()
         oft[i].refCount = 0;
     for (i=0; i<NPIPE; i++)
         pipe[i].busy = 0;
-
 
     /**** create P0 as running ******/
     p = get_proc(&freeList, FREE);

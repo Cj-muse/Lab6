@@ -160,10 +160,33 @@ PROC *kfork(char *filename)
 		p->uss = 0;
 	}
 
+	//copyFds(p);
+	for (i=0; i<NFD; i++)
+ 		p->fd[i] = 0;
+
 	printf("\rp->uss = %x p->usp = %d\n\r", p->uss, p->usp);
   enqueue(&readyQueue, p); // enp intreadyQueue by priority
   printf("kfork(): success\n\r");
   return p;
+}
+
+int copyFds(PROC *p)
+{
+	int i = 0;
+	printf("COPYFDS()\n");
+	for (i = 0; i<NFD; i++)
+	{
+  	if (running->fd[i]){ // copy only non-zero entries
+  		p->fd[i] = running->fd[i];
+  		p->fd[i]->refCount++; // inc OFT.refCount by 1
+  		if (p->fd[i]->mode == READ_PIPE)
+  			p->fd[i]->pipe_ptr->nreader++; // pipe.nreader++
+  		if (p->fd[i]->mode == WRITE_PIPE)
+  			p->fd[i]->pipe_ptr->nwriter++; // pipe.nwriter++
+  	}
+  }
+	printf("COPYFDS()\n");
+	return 1;
 }
 
 int kgetpid()

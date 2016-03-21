@@ -177,7 +177,7 @@ typedef struct pipe{
 }PIPE;
 
 PIPE pipe[NPIPE];
-
+#define BROKEN_PIPE 24
 
 typedef struct Oft{
   int   mode;
@@ -274,6 +274,7 @@ int kexit(int exitvalue);
 int kwait(int *status);
 
 PROC *kfork(char *filename);
+int copyFds(PROC *p);
 int kgetpid();
 int kprintstatus();
 int kchname(char name[32]);
@@ -303,8 +304,8 @@ int read_pipe(int fd, char *buf, int n);
 int write_pipe(int fd, char *buf, int n);
 int kpipe(int pd[2]);
 int close_pipe(int fd);
-int initPipe(PIPE *p);
-int initOFT(OFT *t, int mode, PIPE *p);
+PIPE *initPipe();
+OFT *initOFT(int mode, PIPE *p);
 
 //io.c
 int rpu(u32 x);

@@ -20,6 +20,9 @@ int fork()
   if (p == 0)           // kfork failed
     return -1;
 
+    //printf("in fork after kfork\n");
+    //getc();
+
   segment = (p->pid+1)*0x1000;
   copyImage(segment);
 
