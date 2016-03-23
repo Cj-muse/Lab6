@@ -55,6 +55,7 @@ int init()
     for (i=0; i<NPIPE; i++)
         pipe[i].busy = 0;
 
+
     /**** create P0 as running ******/
     p = get_proc(&freeList, FREE);
     p->status = RUNNING;

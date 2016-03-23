@@ -143,6 +143,8 @@ int kpipe(int pd[2])
   p = initPipe();
   readFT = initOFT(READ_PIPE, p);
   writeFT = initOFT(WRITE_PIPE, p);
+  readFT->pipe_ptr = p;
+  writeFT->pipe_ptr = p;
 
   //  Allocate 2 free entries in the PROC.fd[] array,
   for (i=0; i < NFD-1; i++)
@@ -162,12 +164,12 @@ int kpipe(int pd[2])
   pd[1] = i+1;
 
   /* fill user pipe[] array with i, i+1 */
-  printf("p = %d\n", p);
+  //printf("p = %d\n", p);
   put_word(i, running->uss, pd); put_word(i+1, running->uss, pd+1);
   show_pipe(p);
-  
+
   printf("returning from kpipe\n");
-  getc();
+  //getc();
   return 0;
 }
 
@@ -218,7 +220,7 @@ int close_pipe(int fd)
 PIPE *initPipe()
 {
   int i = 0;
-  PIPE *p;
+  //PIPE *p;
 
   printf("creating pipe\n");
   for (i=0; i<NPIPE; i++)
@@ -228,28 +230,27 @@ PIPE *initPipe()
     break;
   }
   pipe[i].busy = 1;
-  p = &pipe[i];
-
+  //p = &pipe[i];
   //printf("p = %d\n",p);
 
-  p->head = p->tail = p->data = 0;
-  p->nwriter = p->nreader = 1;
-  p->room = PSIZE;
-  return p;
+  pipe[i].head = pipe[i].tail = pipe[i].data = 0;
+  pipe[i].nwriter = pipe[i].nreader = 1;
+  pipe[i].room = PSIZE;
+  return &pipe[i];
 }
 
 OFT *initOFT(int mode, PIPE *p)
 {
   int i = 0;
-  OFT *t;
+  //OFT *t;
 
   for (i=0; i<NOFT; i++){
       if (oft[i].refCount == 0) break;
   }
-  t = &oft[i];
+  //t = &oft[i];
   printf("in initoft, mode = %d\n", mode);
-  t->mode = mode;
-  t->refCount = 1;
-  t->pipe_ptr = p;
-  return t;
+  oft[i].mode = mode;
+  oft[i].refCount = 1;
+  //oft[i].pipe_ptr = p;
+  return &oft[i];
 }

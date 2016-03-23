@@ -33,7 +33,7 @@ int kcinth()
        case 1 : r = do_ps();          break;
        case 2 : r = kchname(b);        break;
        case 3 : r = kmode();          break;
-       case 4 : r = tswitch();        break;
+       case 4 : showLists(); r = tswitch();        break;
        case 5 : r = do_wait(b);       break;
        case 6 : r = do_exit(b);       break;
        case 7 : r = fork();           break;

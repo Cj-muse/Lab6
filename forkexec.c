@@ -37,14 +37,16 @@ int fork()
   put_word(segment, segment, p->usp+2*10); // uCS=segment
 
    /**** Copy file descriptors ****/
-   for (i=0; i<NFD; i++){
+   for (i=0; i<NFD; i++)
+   {
       p->fd[i] = running->fd[i];
-      if (p->fd[i] != 0){
-          p->fd[i]->refCount++;
-          if (p->fd[i]->mode == READ_PIPE)
-              p->fd[i]->pipe_ptr->nreader++;
-          if (p->fd[i]->mode == WRITE_PIPE)
-	      p->fd[i]->pipe_ptr->nwriter++;
+      if (p->fd[i] != 0)
+      {
+        p->fd[i]->refCount++;
+        if (p->fd[i]->mode == READ_PIPE)
+            p->fd[i]->pipe_ptr->nreader++;
+        if (p->fd[i]->mode == WRITE_PIPE)
+            p->fd[i]->pipe_ptr->nwriter++;
       }
    }
 

@@ -116,12 +116,14 @@ int pipe()
    getpid(), pd[0], pd[1]);
 
    //fork child to share pipe
-   printf("now attempting to fork child to share pipe\n");
+   /*printf("now attempting to fork child to share pipe\n");
    getc();
    child = syscall(7,0,0,0);
 
+   printf("kfork returned: %d\n", child);
+*/
    //syscall(34,0,0,0); //pfd
-   if (child)
+   /*if (child)
    {
      printf("parent %d return form fork, child=%d\n", getpid(), child);
      // parent writes to pipe close read oft pd[0]
@@ -137,7 +139,7 @@ int pipe()
      close_pipe();
      //now child can read from pipe
      read_pipe();
-   }
+   }*/
    //syscall(34,0,0,0); //pfd
 }
 
