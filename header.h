@@ -208,9 +208,6 @@ typedef struct proc{
     int    kstack[SSIZE];      // per proc stack area
 }PROC;
 
-/******Conner's Additions Below***********/
-// additions from io.h from lab 2
-
 
 struct partition {         // Partition table entry in MBR
        u8  drive;          // 0x80 - active

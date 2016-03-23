@@ -108,7 +108,7 @@ PROC *kfork(char *filename)
 {
 	 int i;
 	 u16 segment;
-   PROC *p = get_proc(&freeList, FREE);
+   	PROC *p = get_proc(&freeList, FREE);
 
 	 printf("in kfork filename = %s\n", filename);
 	 printf("in kfork filename = %d\n", filename);

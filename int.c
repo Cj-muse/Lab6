@@ -27,7 +27,7 @@ int kcinth()
    c = get_word(segment, offset + 2*PC);
    d = get_word(segment, offset + 2*PD);
 
- printf("interupthandler a = %d\n", a);
+ 	//printf("interupthandler a = %d\n", a);
    switch(a){
        case 0 : r = running->pid;     break;
        case 1 : r = do_ps();          break;
@@ -53,7 +53,7 @@ int kcinth()
        case 99: do_exit(b);           break;
        default: printf("invalid syscall # : %d\n", a);
    }
-   printf("interupthandler r = %d\n", r);
+   //printf("interupthandler r = %d\n", r);
    //getc();
    put_word(r, segment, offset + 2*AX);
 }

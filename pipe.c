@@ -4,8 +4,8 @@ show_pipe(PIPE *p)
    int i, j;
    //validate pipe
    if (!pipe)
-   {
-     printf("show_pipe(): Invalid Pipe\n");
+	{
+		printf("show_pipe(): Invalid Pipe\n");
    }
    // print pipe information
    printf("------------ PIPE %d CONTENTS ------------\n", p);
@@ -143,34 +143,29 @@ int kpipe(int pd[2])
   p = initPipe();
   readFT = initOFT(READ_PIPE, p);
   writeFT = initOFT(WRITE_PIPE, p);
-  readFT->pipe_ptr = p;
-  writeFT->pipe_ptr = p;
 
   //  Allocate 2 free entries in the PROC.fd[] array,
   for (i=0; i < NFD-1; i++)
   {
-    printf("allocating file descriptors\n");
-      if (running->fd[i] == 0 && running->fd[i+1] == 0)
+		if (running->fd[i] == 0 && running->fd[i+1] == 0)
       {
-          running->fd[i]   = readFT;
-          running->fd[i+1] = writeFT;
-          break;
+			running->fd[i]   = readFT;
+         running->fd[i+1] = writeFT;
+         break;
       }
   }
 
-  printf("allocation successfull\n");
   // set indicies of running procs fd's to pd[]
   pd[0] = i;
   pd[1] = i+1;
 
-  /* fill user pipe[] array with i, i+1 */
-  //printf("p = %d\n", p);
-  put_word(i, running->uss, pd); put_word(i+1, running->uss, pd+1);
-  show_pipe(p);
-
-  printf("returning from kpipe\n");
-  //getc();
-  return 0;
+  	/* fill user pipe[] array with i, i+1 */
+ 	put_word(i, running->uss, pd);
+	put_word(i+1, running->uss, pd+1);
+	
+  	printf("returning from kpipe\n");
+  	//getc();
+  	return 0;
 }
 
 int close_pipe(int fd)
@@ -220,9 +215,8 @@ int close_pipe(int fd)
 PIPE *initPipe()
 {
   int i = 0;
-  //PIPE *p;
-
-  printf("creating pipe\n");
+  
+  printf("Initializing pipe\n");
   for (i=0; i<NPIPE; i++)
   {
     printf("pipe[%d]: %d\n",i,pipe[i]);
@@ -230,9 +224,6 @@ PIPE *initPipe()
     break;
   }
   pipe[i].busy = 1;
-  //p = &pipe[i];
-  //printf("p = %d\n",p);
-
   pipe[i].head = pipe[i].tail = pipe[i].data = 0;
   pipe[i].nwriter = pipe[i].nreader = 1;
   pipe[i].room = PSIZE;
@@ -242,15 +233,14 @@ PIPE *initPipe()
 OFT *initOFT(int mode, PIPE *p)
 {
   int i = 0;
-  //OFT *t;
-
+  
   for (i=0; i<NOFT; i++){
       if (oft[i].refCount == 0) break;
   }
-  //t = &oft[i];
-  printf("in initoft, mode = %d\n", mode);
-  oft[i].mode = mode;
-  oft[i].refCount = 1;
-  //oft[i].pipe_ptr = p;
-  return &oft[i];
+  
+	//printf("in initoft, mode = %d\n", mode);
+	oft[i].mode = mode;
+  	oft[i].refCount = 1;
+  	oft[i].pipe_ptr = p;
+  	return &oft[i];
 }
