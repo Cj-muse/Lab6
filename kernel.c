@@ -129,7 +129,7 @@ PROC *kfork(char *filename)
       p->kstack[SSIZE-i]= 0 ; // all 0's
    }
 
-   p->kstack[SSIZE-1] = (int)body; // resume point=address of body()
+   p->kstack[SSIZE-1] = (int)goUmode; // resume point=address of body()
    p->ksp = &p->kstack[SSIZE-9]; // proc saved sp
 
 	if(filename)
@@ -167,6 +167,7 @@ PROC *kfork(char *filename)
 	printf("\rp->uss = %x p->usp = %d\n\r", p->uss, p->usp);
   enqueue(&readyQueue, p); // enp intreadyQueue by priority
   printf("kfork(): success\n\r");
+	getc();
   return p;
 }
 

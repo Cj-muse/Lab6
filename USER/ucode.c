@@ -114,8 +114,8 @@ int pipe()
    syscall(30, pd, 0, 0);
    printf("proc %d created a pipe with fd = %d %d\n", getpid(), pd[0], pd[1]);
 
-   syscall(34,0,0,0); //pfd
-	
+   //syscall(34,0,0,0); //pfd
+
    //fork child to share pipe
    /*printf("now attempting to fork child to share pipe\n");
    getc();

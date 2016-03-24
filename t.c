@@ -69,12 +69,14 @@ int init()
 
 int scheduler()
 {
+  printf("made it to scheduler\n");
   if (running->status == READY)
 	{
    	enqueue(&readyQueue, running);
 	}
    running = dequeue(&readyQueue);
    color = running->pid + 1;
+   printf("leaving scheduler\n");
 }
 
 int int80h();

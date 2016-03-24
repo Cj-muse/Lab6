@@ -141,28 +141,30 @@ int kpipe(int pd[2])
 
   // create a pipe; fill pd[0] pd[1] (in USER mode!!!) with descriptors
   p = initPipe();
-  readFT = initOFT(READ_PIPE, p);
-  writeFT = initOFT(WRITE_PIPE, p);
+  printf("p->busy: %d\n", p->busy);
+  printf("p->data: %d\n", p->data);
+  //readFT = initOFT(READ_PIPE, p);
+  //writeFT = initOFT(WRITE_PIPE, p);
 
   //  Allocate 2 free entries in the PROC.fd[] array,
-  for (i=0; i < NFD-1; i++)
+  /*for (i=0; i < NFD-1; i++)
   {
 		if (running->fd[i] == 0 && running->fd[i+1] == 0)
-      {
-			running->fd[i]   = readFT;
-         running->fd[i+1] = writeFT;
-         break;
-      }
-  }
+    {
+		    running->fd[i]   = readFT;
+        running->fd[i+1] = writeFT;
+        break;
+    }
+  }*/
 
   // set indicies of running procs fd's to pd[]
-  pd[0] = i;
-  pd[1] = i+1;
+  //pd[0] = i;
+  //pd[1] = i+1;
 
   	/* fill user pipe[] array with i, i+1 */
- 	put_word(i, running->uss, pd);
-	put_word(i+1, running->uss, pd+1);
-	
+ 	//put_word(i, running->uss, &pd[0]);
+	//put_word(i+1, running->uss, &pd[1]);
+
   	printf("returning from kpipe\n");
   	//getc();
   	return 0;
@@ -215,11 +217,11 @@ int close_pipe(int fd)
 PIPE *initPipe()
 {
   int i = 0;
-  
+
   printf("Initializing pipe\n");
   for (i=0; i<NPIPE; i++)
   {
-    printf("pipe[%d]: %d\n",i,pipe[i]);
+    printf("pipe[%d]: %d\n",i,&pipe[i]);
     if (pipe[i].busy == 0)
     break;
   }
@@ -233,11 +235,11 @@ PIPE *initPipe()
 OFT *initOFT(int mode, PIPE *p)
 {
   int i = 0;
-  
+
   for (i=0; i<NOFT; i++){
       if (oft[i].refCount == 0) break;
   }
-  
+
 	//printf("in initoft, mode = %d\n", mode);
 	oft[i].mode = mode;
   	oft[i].refCount = 1;
