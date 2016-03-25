@@ -167,7 +167,7 @@ PROC *kfork(char *filename)
 	printf("\rp->uss = %x p->usp = %d\n\r", p->uss, p->usp);
   enqueue(&readyQueue, p); // enp intreadyQueue by priority
   printf("kfork(): success\n\r");
-	getc();
+	//getc();
   return p;
 }
 

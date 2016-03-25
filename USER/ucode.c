@@ -197,6 +197,7 @@ int close_pipe()
 {
   char s[16];
   int fd;
+	pfd();
   printf("enter fd to close : ");
   gets(s);
   fd = atoi(s);

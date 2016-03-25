@@ -24,27 +24,35 @@ show_pipe(PIPE *p)
 
 int pfd()
 {
-  int i = 0;
-
-  // print running process' opened file descriptors
-  printf("--------Proc %dOpen File Decsriptors---------\n", running->pid);
-
-  for(i=0; running->fd[i] != 0; i++)
-  {
-    printf("fd[%d]: \n",i);
-    printf("mode:     %d\n",   running->fd[i]->mode);
-    printf("refCount: %d\n",   running->fd[i]->refCount);
-    //printf("fd->pipe->busy: %d\n", running->fd[i]->(struct *pipe_ptr));
-  }
-  if (0 == i) {printf("NONE\n");}
-
-  printf("---------------------------------------------\n");
+	int i = 0, mode = 0;
+	
+  	// print running process' opened file descriptors
+	printf("-----------Proc %dOpen File Decsriptors-----------\n", running->pid);
+ 	for(i=0; i<20; i++)
+ 	{
+		if(running->fd[i])
+		{
+   		printf("fd[%d]:     ",i);
+	
+			//print mode
+			mode = running->fd[i]->mode;
+			if(mode == 4)				{printf("Mode: read     ");}
+			else if(mode == 5)		{printf("Mode: write    ");}
+			else 							{printf("Mode: unknown  ");}
+    
+		   printf("refCount: %d  ",   running->fd[i]->refCount);
+			printf("Pipe data: %d\n", running->fd[i]->pipe_ptr->data);
+		}	
+   }
+  	if (0 == i) {printf("NONE\n");}
+  	printf("--------------------------------------------------\n");
 }
 
 int read_pipe(int fd, char *buf, int n)
 {
   // your code for read_pipe()
-  int r = 0;
+	int r = 0;
+	char c;
   OFT *oft = running->fd[fd];
   PIPE *p = oft->pipe_ptr;
   if (n<=0)
@@ -59,22 +67,27 @@ int read_pipe(int fd, char *buf, int n)
     printf("read_pipe: not a valid pipe_ptr\n");
     return -1;
   }
+	//make sure you are using the oft of the correct mode
+	if(oft->mode != READ_PIPE)
+	{
+		printf("fd is of wrong mode \n");
+		return -1;
+	}
 
-  printf("ReadPipe: \n");
-  show_pipe(p);
-  printf("oft %d\n", oft);
-  printf("oft->refCount: %d\n", oft->refCount);
-  printf("oft->mode: %d\n", oft->mode);
+  	printf("ReadPipe: \n");
+  	show_pipe(p);
 
   //validate fd; from fd, get OFT and pipe pointer p;
   while(n)
   {
     while(p->data)
-    {//read a byte form pipe to buf;
+    {//read a byte from pipe to buf;
       buf[r] = p->buf[r];
+		//where is buf in relation to user space and kernal space?
+		put_byte(buf[r], running->uss, p->buf+r);
       n--; r++; p->data--; p->room++;
-      if (n==0)
-      break;
+		
+		if (n==0)  break;
     }
     if (r){ // has read some data
       kwakeup(p->room);
@@ -93,43 +106,52 @@ int read_pipe(int fd, char *buf, int n)
 
 int write_pipe(int fd, char *buf, int n)
 {
-  // your code for write_pipe()
-  int r = 0;
-  OFT *oft = running->fd[fd];
-  PIPE *p = oft->pipe_ptr;
+   int r = 0;
+	char c;
+   OFT *oft = running->fd[fd];
+   PIPE *p = oft->pipe_ptr;
 
-  if (n<=0)
-  return 0;
+	printf("WritePipe:\n");	
 
-  //perform checks on pipe ptr and open file table
-  if (!oft) {
-    printf("write_pipe: not a valid fd\n");
-    return -1;
-  }
-  if (!p) {
-    printf("write_pipe: not a valid pipe_ptr\n");
-    return -1;
-  }
+  	if (n<=0)
+  	return 0;
 
-  //validate fd; from fd, get OFT and pipe pointer p;
+	//validate fd; from fd, get OFT and pipe pointer p;	
+ 	//perform checks on pipe ptr and open file table
+  	if (!oft) {
+    	printf("write_pipe: not a valid fd\n");
+    	return -1;
+  	}
+  	if (!p) {
+    	printf("write_pipe: not a valid pipe_ptr\n");
+   	return -1;
+  	}	
+	//make sure you are using the oft of the correct mode
+	if(oft->mode != WRITE_PIPE)
+	{
+		printf("fd is of wrong mode \n");
+		return -1;
+	}
+
   while (n)
   {
-    if (!p->nreader) // no more readers
-      kexit(BROKEN_PIPE); // BROKEN_PIPE error
-    while(p->room)
-    {
-      //write a byte from buf to pipe;
-      r++; p->data++; p->room--; n--;
-      if (n==0)
-      break;
-    }
+    	if (!p->nreader) // no more readers
+    	  kexit(BROKEN_PIPE); // BROKEN_PIPE error
+	   while(p->room)
+		{
+			//write a byte from buf to pipe;
+			put_byte(buf[r], running->uss, p->buf + r);
+      	r++; p->data++; p->room--; n--;
+      	if (n==0)
+      	break;
+    	}
 
-    kwakeup(p->data); // wakeup ALL readers, if any.
-    if (n==0)
-    return r; // finished writing n bytes
+    	kwakeup(p->data); // wakeup ALL readers, if any.
+    	if (n==0)
+    	return r; // finished writing n bytes
 
-    // still has data to write but pipe has no room
-    ksleep(p->room); // sleep for room
+    	// still has data to write but pipe has no room
+    	ksleep(p->room); // sleep for room
   }
 }
 
@@ -143,11 +165,11 @@ int kpipe(int pd[2])
   p = initPipe();
   printf("p->busy: %d\n", p->busy);
   printf("p->data: %d\n", p->data);
-  //readFT = initOFT(READ_PIPE, p);
-  //writeFT = initOFT(WRITE_PIPE, p);
+  readFT = initOFT(READ_PIPE, p);
+  writeFT = initOFT(WRITE_PIPE, p);
 
   //  Allocate 2 free entries in the PROC.fd[] array,
-  /*for (i=0; i < NFD-1; i++)
+  for (i=0; i < NFD-1; i++)
   {
 		if (running->fd[i] == 0 && running->fd[i+1] == 0)
     {
@@ -155,15 +177,15 @@ int kpipe(int pd[2])
         running->fd[i+1] = writeFT;
         break;
     }
-  }*/
+  }
 
   // set indicies of running procs fd's to pd[]
   //pd[0] = i;
   //pd[1] = i+1;
 
   	/* fill user pipe[] array with i, i+1 */
- 	//put_word(i, running->uss, &pd[0]);
-	//put_word(i+1, running->uss, &pd[1]);
+ 	put_word(i, running->uss, &pd[0]);
+	put_word(i+1, running->uss, &pd[1]);
 
   	printf("returning from kpipe\n");
   	//getc();
