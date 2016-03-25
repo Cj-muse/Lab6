@@ -24,7 +24,8 @@ show_pipe(PIPE *p)
 
 int pfd()
 {
-	int i = 0, mode = 0;
+	int i = 0, j =0, mode = 0;
+	char c;
 	
   	// print running process' opened file descriptors
 	printf("-----------Proc %dOpen File Decsriptors-----------\n", running->pid);
@@ -32,7 +33,7 @@ int pfd()
  	{
 		if(running->fd[i])
 		{
-   		printf("fd[%d]:     ",i);
+	   		printf("fd[%d]:     ",i);
 	
 			//print mode
 			mode = running->fd[i]->mode;
@@ -42,6 +43,15 @@ int pfd()
     
 		   printf("refCount: %d  ",   running->fd[i]->refCount);
 			printf("Pipe data: %d\n", running->fd[i]->pipe_ptr->data);
+			printf("buf:");
+			while(c)
+			{
+				//c = get_byte(running->uss, running->fd[i]->pipe_ptr->buf+j);
+				c = 
+				printf("%c", c);
+				j++;
+			}
+			j = 0;c = 'a';printf("\n");
 		}	
    }
   	if (0 == i) {printf("NONE\n");}
@@ -75,16 +85,22 @@ int read_pipe(int fd, char *buf, int n)
 	}
 
   	printf("ReadPipe: \n");
-  	show_pipe(p);
+	printf("fd = %d\n", fd);
+	printf("buf: %x\n", buf);
+	printf("p->buf %x\n", p->buf);
+  	//show_pipe(p);
 
   //validate fd; from fd, get OFT and pipe pointer p;
   while(n)
   {
     while(p->data)
     {//read a byte from pipe to buf;
-      buf[r] = p->buf[r];
+      //buf[r] = p->buf[r];
 		//where is buf in relation to user space and kernal space?
-		put_byte(buf[r], running->uss, p->buf+r);
+		//c = get_byte(running->uss, p->buf+r);
+		c = p->buf+r;
+		printf("got byte %c\n", c);
+		put_byte(c, running->uss, buf+r);
       n--; r++; p->data--; p->room++;
 		
 		if (n==0)  break;
@@ -106,12 +122,21 @@ int read_pipe(int fd, char *buf, int n)
 
 int write_pipe(int fd, char *buf, int n)
 {
-   int r = 0;
+   int r = 0, i = 0;
 	char c;
    OFT *oft = running->fd[fd];
    PIPE *p = oft->pipe_ptr;
 
 	printf("WritePipe:\n");	
+	printf("fd %d", fd);
+	printf("buf passed: %x\n", buf);
+	printf("p->buf %x\n", p->buf);
+	for(i = 0; i<n; i++)
+	{
+		c = get_byte(running->uss, buf+i);
+		printf("c=%c ", c);
+	}
+
 
   	if (n<=0)
   	return 0;
@@ -140,7 +165,10 @@ int write_pipe(int fd, char *buf, int n)
 	   while(p->room)
 		{
 			//write a byte from buf to pipe;
-			put_byte(buf[r], running->uss, p->buf + r);
+			printf("writing byte\n");
+			c = get_byte(running->uss, buf+r);
+			//put_byte(c, running->uss, p->buf + r);
+			p->buf[r] = c; 
       	r++; p->data++; p->room--; n--;
       	if (n==0)
       	break;

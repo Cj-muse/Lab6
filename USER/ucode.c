@@ -155,7 +155,7 @@ int read_pipe()
   int fd, n, nbytes;
   pfd();
 
-  printf("read : enter fd nbyt	es : ");
+  printf("read : enter fd nbytes : ");
   gets(fds);
   sscanf(fds, "%d %d",&fd, &nbytes);
   printf("fd=%d  nbytes=%d\n", fd, nbytes);
