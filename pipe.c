@@ -47,7 +47,7 @@ int pfd()
 			while(c)
 			{
 				//c = get_byte(running->uss, running->fd[i]->pipe_ptr->buf+j);
-				c = 
+				c =  running->fd[i]->pipe_ptr->buf[j];
 				printf("%c", c);
 				j++;
 			}
@@ -69,14 +69,14 @@ int read_pipe(int fd, char *buf, int n)
   return 0;
 
   //perform checks on pipe ptr and open file table
-  if (!oft) {
-    printf("read_pipe: not a valid fd\n");
-    return -1;
-  }
-  if (!p) {
-    printf("read_pipe: not a valid pipe_ptr\n");
-    return -1;
-  }
+ 	if (!oft) {
+   	printf("read_pipe: not a valid fd\n");
+    	return -1;
+  	}
+  	if (!p) {
+    	printf("read_pipe: not a valid pipe_ptr\n");
+    	return -1;
+  	}
 	//make sure you are using the oft of the correct mode
 	if(oft->mode != READ_PIPE)
 	{
@@ -90,34 +90,40 @@ int read_pipe(int fd, char *buf, int n)
 	printf("p->buf %x\n", p->buf);
   	//show_pipe(p);
 
-  //validate fd; from fd, get OFT and pipe pointer p;
-  while(n)
-  {
-    while(p->data)
-    {//read a byte from pipe to buf;
-      //buf[r] = p->buf[r];
-		//where is buf in relation to user space and kernal space?
-		//c = get_byte(running->uss, p->buf+r);
-		c = p->buf+r;
-		printf("got byte %c\n", c);
-		put_byte(c, running->uss, buf+r);
-      n--; r++; p->data--; p->room++;
+  	//validate fd; from fd, get OFT and pipe pointer p;
+  	while(n)
+  	{
+    	while(p->data)
+    	{//read a byte from pipe to buf;
+			c = p->buf[p->tail++];
+			put_byte(c, running->uss, buf);
+         p->tail %= PSIZE;
+         p->data--; p->room++;
+         n--; r++; buf++;
+
+      	//buf[r] = p->buf[r];
+			//where is buf in relation to user space and kernal space?
+			//c = get_byte(running->uss, p->buf+r);
+			//c = p->buf+r;
+			printf("got byte %c\n", c);
+			//put_byte(c, running->uss, buf+r);
+      	//n--; r++; p->data--; p->room++;
 		
-		if (n==0)  break;
-    }
-    if (r){ // has read some data
-      kwakeup(p->room);
-      return r;
-    }
-    // pipe has no data
-    if (p->nwriter){ // if pipe still has writer
-      kwakeup(p->room); // wakeup ALL writers, if any.
-      ksleep(p->data); // sleep for data
-      continue;
-    }
-    // pipe has no writer and no data
-    return 0;
-  }
+			if (n==0)  break;
+    	}
+    	if (r){ // has read some data
+      	kwakeup(p->room);
+      	return r;
+    	}
+    	// pipe has no data
+    	if (p->nwriter){ // if pipe still has writer
+      	kwakeup(p->room); // wakeup ALL writers, if any.
+      	ksleep(p->data); // sleep for data
+      	continue;
+    	}
+    	// pipe has no writer and no data
+    	return 0;
+  	}
 }
 
 int write_pipe(int fd, char *buf, int n)
@@ -166,10 +172,14 @@ int write_pipe(int fd, char *buf, int n)
 		{
 			//write a byte from buf to pipe;
 			printf("writing byte\n");
-			c = get_byte(running->uss, buf+r);
+			p->buf[p->head++] = get_byte(running->uss, buf);
+	      p->head %= PSIZE;
+   	   p->data++; p->room--;
+      	n--; r++; buf++;
+			//c = get_byte(running->uss, buf+r);
 			//put_byte(c, running->uss, p->buf + r);
-			p->buf[r] = c; 
-      	r++; p->data++; p->room--; n--;
+			//p->buf[r] = c; 
+      	//r++; p->data++; p->room--; n--;
       	if (n==0)
       	break;
     	}
